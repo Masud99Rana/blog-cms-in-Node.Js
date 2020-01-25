@@ -10,5 +10,8 @@
     "CMS"
   ],
   "author": "Masud Rana",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
 }
