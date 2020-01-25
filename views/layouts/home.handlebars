@@ -1,42 +1,50 @@
 <!DOCTYPE html>
 <html lang="en">
 
-  <head>
+<head>
 
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Blog Home - Start Bootstrap Template</title>
+    <title>Blog Home - MR CMS</title>
 
     <!-- Bootstrap core CSS -->
-    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/home/bootstrap.min.css" rel="stylesheet">
 
-    <!-- Custom styles for this template -->
-    <link href="css/blog-home.css" rel="stylesheet">
+    <!-- Custom styles for the home page -->
+    <link href="/css/home/blog-home.css" rel="stylesheet">
 
-  </head>
+    <!-- Custom styles for the post single -->
 
-  <body>
+    <link href="/css/home/blog-post.css" rel="stylesheet">
 
-    <!-- Navigation -->
-    {{> home/home-nav }}
+</head>
 
-    <!-- Page Content -->
-    <div class="container">
-      {{{body}}}
-    </div>
-    <!-- /.container -->
+<body>
 
-    <!-- Footer -->
-    {{> home/footer }}
+<!-- Navigation -->
+
+{{> home/home-nav}}
 
 
-    <!-- Bootstrap core JavaScript -->
-    <script src="vendor/jquery/jquery.min.js"></script>
-    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<!-- Page Content -->
+<div class="container">
 
-  </body>
+   {{{body}}}
+
+</div>
+<!-- /.container -->
+
+<!-- Footer -->
+
+{{> home/footer}}
+
+<!-- Bootstrap core JavaScript -->
+<script src="js/home/jquery.min.js"></script>
+<script src="js/home/bootstrap.bundle.min.js"></script>
+
+</body>
 
 </html>
