@@ -23,6 +23,16 @@ app.get('/about',(req, res)=>{
 	res.render("home/about");
 });
 
+app.get('/login',(req, res)=>{
+	// res.send("home/about");
+	res.render("home/login");
+});
+
+app.get('/register',(req, res)=>{
+	// res.send("home/about");
+	res.render("home/register");
+});
+
 const port = process.env.PORT || 4500;
 app.listen(port, ()=>{
 	console.log(`listening on port ${port}`);
