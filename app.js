@@ -14,24 +14,11 @@ app.set('view engine', 'handlebars');
 //handlebars auto search home.hanlebars in layouts folder
 
 
-app.get('/',(req, res)=>{
-	res.render("home/index");
-});
+// Load Routes
+const home = require('./routes/home/index.js');
 
-app.get('/about',(req, res)=>{
-	// res.send("home/about");
-	res.render("home/about");
-});
-
-app.get('/login',(req, res)=>{
-	// res.send("home/about");
-	res.render("home/login");
-});
-
-app.get('/register',(req, res)=>{
-	// res.send("home/about");
-	res.render("home/register");
-});
+// Use Routes
+app.use('/', home);
 
 const port = process.env.PORT || 4500;
 app.listen(port, ()=>{
