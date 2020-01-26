@@ -15,12 +15,16 @@ const PostSchema = new Schema({
 
 	allowComments:{
 	    type: Boolean,
-	    require: true
+	    required: true
 	},
 
 	body:{
 	    type: String,
-	    require: true
+	    required: true
+	},
+
+	file:{
+	    type: String,
 	}
 });
 

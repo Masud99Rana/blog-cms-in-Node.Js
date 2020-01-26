@@ -5,6 +5,7 @@ const exphbs = require('express-handlebars');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const methodOverride = require('method-override');
+const upload = require('express-fileupload');
 
 
 // DB connection
@@ -28,6 +29,9 @@ app.set('view engine', 'handlebars');
 
 // Method Override
 app.use(methodOverride('_method'));
+
+// Upload Middleware
+app.use(upload());
 
 // Body Parser
 app.use(bodyParser.urlencoded({extended: true}));

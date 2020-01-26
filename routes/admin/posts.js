@@ -1,6 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const Post = require('../../models/Post')
+const { isEmpty, uploadDir } = require('../../helpers/upload-helper');
+const fs = require('fs');
+
 
 router.all('/*', (req, res, next)=>{
     req.app.locals.layout = 'admin';
@@ -11,7 +14,7 @@ router.all('/*', (req, res, next)=>{
 router.get('/',(req,res)=>{
 	// res.send("It works");
 	Post.find({}).then(posts=>{
-		// console.log(posts);
+		console.log(posts);
 		const context = {
 	        postsDocuments: posts.map(document => {
 	          return {
@@ -19,7 +22,8 @@ router.get('/',(req,res)=>{
 	            title: document.title,
 	            body: document.body,
 	            status: document.status,
-	            allowComments: document.allowComments
+	            allowComments: document.allowComments,
+	            file: document.file || "flower.jpg"
 	          }
 	        })
 		};
@@ -39,27 +43,67 @@ router.post('/create',(req,res)=>{
 	// res.send('It works');
 	// console.log(req.body);
 	// console.log(req.body.allowComments);
+	// console.log(req.files); must need the module
 	
-	let allowComments = true;
-	if(req.body.allowComments){
-	    allowComments = true;
-	} else{
-	    allowComments = false;
+	// let file = req.files.file;
+	// let filename = file.name;
+	// file.mv('./public/uploads/'+filename, (err)=>{
+	// 	if(err) throw err;
+	// });
+	// 
+	let errors = [];
+
+	if(!req.body.title) {
+	    errors.push({message: 'Please add a title'});
 	}
 
-	const newPost = new Post({
-		title: req.body.title,
-		status: req.body.status,
-		allowComments: allowComments,
-		body: req.body.body
-	});
-	
-	newPost.save().then(savedPost=>{
-		// console.log(savedPost); data we back
-		res.redirect('/admin/posts');
-	}).catch(error=>{
-		console.log("Could not saved");
-	});
+	if(!req.body.body) {
+	    errors.push({message: 'Please add a description'});
+	}
+
+	if(errors.length > 0){
+	    res.render('admin/posts/create', {
+	        errors: errors
+	    })
+
+	} else {
+
+		let filename = 'flower.jpg';
+
+		if(!isEmpty(req.files)){
+			let file = req.files.file;
+			filename = Date.now() + '-' + file.name;
+
+			file.mv(uploadDir + filename, (err)=>{
+		    	if(err) throw err;
+			});
+		}
+
+
+		let allowComments = true;
+		if(req.body.allowComments){
+		    allowComments = true;
+		} else{
+		    allowComments = false;
+		}
+
+		const newPost = new Post({
+			title: req.body.title,
+			status: req.body.status,
+			allowComments: allowComments,
+			body: req.body.body,
+			file: filename
+		});
+		
+		newPost.save().then(savedPost=>{
+			// console.log(savedPost); data we back
+			res.redirect('/admin/posts');
+		}).catch(validator=>{
+			//console.log(error.errors);
+			res.render('admin/posts/create', {errors: validator.errors})
+			console.log("Could not saved");
+		});
+	}
 });
 
 
@@ -90,14 +134,25 @@ router.put('/edit/:id', (req,res)=>{
     Post.findOne({_id: req.params.id})
         .then(post=>{
         	// console.log(post);
-        	console.log(req.body.allowComments);
+        	// console.log(req.body.allowComments);
     		
     		let allowComments = true;
-			
+			let filename = 'flower.jpg';
+
 			if(req.body.allowComments){
 			    allowComments = true;
 			} else{
 			    allowComments = false;
+			}
+
+			if(!isEmpty(req.files)){
+			    let file = req.files.file;
+			    filename = Date.now() + '-' + file.name;
+			    post.file = filename;
+
+			    file.mv('./public/uploads/' + filename, (err)=>{
+			        if(err) throw err;
+			    });
 			}
 
 			post.title = req.body.title;
@@ -107,7 +162,7 @@ router.put('/edit/:id', (req,res)=>{
 
          	post.save().then(updatedPost=>{
          		res.redirect('/admin/posts');
-         	})
+         	});
     });
 });
 
@@ -118,8 +173,10 @@ router.delete('/:id', (req,res)=>{
 	Post.findOne({_id: req.params.id})
 	    .then(post =>{
 			// res.send('Got it.');
-			post.remove().then(postRemoved=>{
-			    res.redirect('/admin/posts');
+			fs.unlink(uploadDir + post.file, (err)=>{
+				post.remove().then(postRemoved=>{
+				    res.redirect('/admin/posts');
+				});
 			});
 	    })
 	    .catch(err =>{
