@@ -53,6 +53,10 @@ app.use(flash());
 app.use((req, res, next)=>{
 
     res.locals.success_message = req.flash('success_message');
+    res.locals.error_message = req.flash('error_message');
+    res.locals.form_errors = req.flash('form_errors');
+    res.locals.error = req.flash('error');
+    
     next();
 });
 
