@@ -14,7 +14,7 @@ router.all('/*', (req, res, next)=>{
 router.get('/',(req,res)=>{
 	// res.send("It works");
 	Post.find({}).then(posts=>{
-		console.log(posts);
+		// console.log(posts);
 		const context = {
 	        postsDocuments: posts.map(document => {
 	          return {
@@ -23,6 +23,7 @@ router.get('/',(req,res)=>{
 	            body: document.body,
 	            status: document.status,
 	            allowComments: document.allowComments,
+	            date: document.date,
 	            file: document.file || "flower.jpg"
 	          }
 	        })

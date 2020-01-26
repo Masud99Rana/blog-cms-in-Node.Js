@@ -23,8 +23,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Set up View Engine
 const {select} = require('./helpers/handlebars-helpers');
+const {generateDate} = require('./helpers/handlebars-helpers');
 
-app.engine('handlebars',exphbs({defaultLayout: 'home', helpers:{select:select}}) )
+app.engine('handlebars',exphbs({defaultLayout: 'home', helpers:{select:select, generateDate: generateDate}}) )
 app.set('view engine', 'handlebars'); 
 //handlebars auto search home.hanlebars in layouts folder
 
