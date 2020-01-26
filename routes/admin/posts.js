@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Post = require('../../models/Post')
+const Category = require('../../models/Category')
 const { isEmpty, uploadDir } = require('../../helpers/upload-helper');
 const fs = require('fs');
 
@@ -36,7 +37,18 @@ router.get('/',(req,res)=>{
 
 // Show create post form
 router.get('/create', (req, res)=>{
-	res.render('admin/posts/create');
+	Category.find({}).then(categories=>{
+		const catContext = {
+		    categoryDocs: categories.map(document => {
+		      return {
+		        id: document._id,
+		        name: document.name
+		      }
+		    })
+		};
+		res.render('admin/posts/create',{categories: catContext.categoryDocs});
+
+	});
 });
 
 // Create new Post
@@ -93,8 +105,10 @@ router.post('/create',(req,res)=>{
 			status: req.body.status,
 			allowComments: allowComments,
 			body: req.body.body,
-			file: filename
+			file: filename,
+			category: req.body.category
 		});
+
 		
 		newPost.save().then(savedPost=>{
 			// console.log(savedPost); data we get back
@@ -117,16 +131,30 @@ router.get('/edit/:id', (req, res)=>{
     Post.findOne({_id: req.params.id})
         .then(post=>{
         	// console.log(post);
-    		
-    		const postsDocument = {
-	            id: post._id,
-	            title: post.title,
-	            body: post.body,
-	            status: post.status,
-	            allowComments: post.allowComments
-			};
+    		Category.find({}).then(categories=>{
+	    		const postsDocument = {
+		            id: post._id,
+		            title: post.title,
+		            body: post.body,
+		            status: post.status,
+		            allowComments: post.allowComments,
+		            category: post.category
+				};
 
-         	res.render('admin/posts/edit', {post: postsDocument});
+				const catContext = {
+				    categoryDocs: categories.map(document => {
+				      return {
+				        id: document._id,
+				        name: document.name
+				      }
+				    })
+				};
+
+	         	res.render('admin/posts/edit', {
+	         		post: postsDocument, 
+	         		categories: catContext.categoryDocs
+	         	});
+    		});
     });
 });
 
@@ -162,6 +190,7 @@ router.put('/edit/:id', (req,res)=>{
 			post.status = req.body.status;
 			post.allowComments = allowComments;
 			post.body = req.body.body;
+			post.category = req.body.category;
 
          	post.save().then(updatedPost=>{
          		req.flash('success_message', `Post ${updatedPost.title} was updated successfully.`);

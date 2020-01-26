@@ -13,6 +13,15 @@
     </div>
 
     <div class="form-group">
+        <label for="status">Category</label>
+        <select name="category" id="status" class="form-control">
+            {{#each categories}}
+            <option value="{{id}}">{{name}}</option>
+            {{/each}}
+        </select>
+    </div>
+
+    <div class="form-group">
         <label for="file">File Upload</label>
         <input type="file" name="file" class="form-control" >
     </div>

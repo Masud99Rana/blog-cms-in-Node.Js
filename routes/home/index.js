@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Post  = require('../../models/Post');
-const { uploadDir } = require('../../helpers/upload-helper');
+const Category = require('../../models/Category');
 
 router.all('/*', (req, res, next)=>{
     req.app.locals.layout = 'home';
@@ -13,22 +13,37 @@ router.get('/',(req, res)=>{
 	
 	Post.find({}).then(posts=>{
 		// console.log(posts);
-		const context = {
-	        postsDocuments: posts.map(document => {
-	          return {
-	            id: document._id,
-	            title: document.title,
-	            body: document.body,
-	            status: document.status,
-	            allowComments: document.allowComments,
-	            date: document.date,
-	            file: document.file || "flower.jpg"
-	          }
-	        })
-		};
-		// console.log(context.postsDocuments);
-		      
-	    res.render("home/index", {posts: context.postsDocuments});
+		Category.find({}).then(categories=>{
+			
+			const context = {
+		        postsDocuments: posts.map(document => {
+		          return {
+		            id: document._id,
+		            title: document.title,
+		            body: document.body,
+		            status: document.status,
+		            allowComments: document.allowComments,
+		            date: document.date,
+		            file: document.file || "flower.jpg"
+		          }
+		        })
+			};
+
+			const catContext = {
+			    categoryDocs: categories.map(document => {
+			      return {
+			        id: document._id,
+			        name: document.name
+			      }
+			    })
+			};
+
+			// console.log(context.postsDocuments);    
+		    res.render("home/index", {
+		    	posts: context.postsDocuments, 
+		    	categories: catContext.categoryDocs
+		    });
+		});
 	});
 });
 
@@ -39,18 +54,30 @@ router.get('/post/:id', (req, res)=>{
     Post.findOne({_id: req.params.id})
         .then(post=>{
         	// console.log(post);
-    		
-    		const postsDocument = {
-	            id: post._id,
-	            title: post.title,
-	            body: post.body,
-	            status: post.status,
-	            allowComments: post.allowComments,
-	            date: post.date,
-	            file: post.file || "flower.jpg"
-			};
+    		Category.find({}).then(categories=>{
+	    		const postsDocument = {
+		            id: post._id,
+		            title: post.title,
+		            body: post.body,
+		            status: post.status,
+		            allowComments: post.allowComments,
+		            date: post.date,
+		            file: post.file || "flower.jpg"
+				};
+				const catContext = {
+				    categoryDocs: categories.map(document => {
+				      return {
+				        id: document._id,
+				        name: document.name
+				      }
+				    })
+				};
 
-         	res.render('home/post', {post: postsDocument});
+	         	res.render('home/post', {
+	         		post: postsDocument,
+	         		categories: catContext.categoryDocs
+	         	});
+	        });
     });
 });
 
