@@ -5,9 +5,13 @@ const PostSchema = new Schema({
 	
 	category: {
 	    type: Schema.Types.ObjectId,
-	    ref: 'categories', // table name
-	    trim: true
+	    ref: 'categories' // table name
 	},
+
+	comments: [{
+	    type: Schema.Types.ObjectId,
+	    ref: 'comments'
+	}],
 
 	title:{
 		type: String,
@@ -33,11 +37,13 @@ const PostSchema = new Schema({
 	    type: String,
 	},
 
-date: {
-    type: Date,
-    default: Date.now()
-}
+	date: {
+	    type: Date,
+	    default: Date.now()
+	}
 
-});
+}
+// {usePushEach: true} // must use comma(,) before it........
+);
 
 module.exports = mongoose.model('posts', PostSchema);
