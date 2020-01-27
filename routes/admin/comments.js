@@ -61,7 +61,13 @@ router.post('/', (req, res)=>{
 
 router.delete('/:id', (req, res)=>{
 
-    Comment.remove({_id: req.params.id}).then(deleteItem=>{
+    //  DeprecationWarning: Mongoose: `findOneAndUpdate()` and `findOneAndDelete()` 
+    //  without the `useFindAndModify` option set to false are deprecated.
+    //
+    //DeprecationWarning: collection.remove is deprecated. 
+    //Use deleteOne, deleteMany, or bulkWrite instead.
+    
+    Comment.deleteOne({_id: req.params.id}).then(deleteItem=>{
         Post.findOneAndUpdate({comments: req.params.id},
             {$pull: {comments: req.params.id}}, (err, data)=>{
                 if(err) console.log(err);
@@ -73,6 +79,13 @@ router.delete('/:id', (req, res)=>{
 
         });
 
+});
+
+router.post('/approve-comment', (req, res)=>{
+    Comment.findByIdAndUpdate(req.body.id, {$set: {approveComment: req.body.approveComment}}, (err, result)=>{
+        if(err) return err;
+        res.send(result)
+    });
 });
 
 module.exports = router;

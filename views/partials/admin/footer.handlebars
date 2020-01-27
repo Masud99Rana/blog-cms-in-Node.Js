@@ -40,3 +40,29 @@
 <script src="/js/admin/bootstrap-switch.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.min.js"></script>
+
+
+
+<script>
+
+    $("[name='approveComment']").bootstrapSwitch();
+
+    $(document).ready(()=>{
+
+        $("[name='approveComment']").on('switchChange.bootstrapSwitch', function(e, data){
+
+            const id = $(this).attr('data-id');
+
+            $.ajax({
+                type: "POST",
+                url: '/admin/comments/approve-comment',
+                data: {id: id, approveComment: data},
+                cache: false,
+                success: function(data){
+                    toastr.success(`Comment with id ${data._id} was updated`);
+                }
+            });
+        });
+    });
+
+</script>
