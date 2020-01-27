@@ -52,35 +52,24 @@ router.get('/',(req, res)=>{
 	});
 });
 
-//Show edit post form
+//Show single post 
 router.get('/post/:id', (req, res)=>{
 	// res.send(req.params.id);
 
     Post.findOne({_id: req.params.id})
+        .populate({path: 'comments', populate: {path: 'user', model: 'users'}})
+        .populate('user')
+        .lean()
         .then(post=>{
         	// console.log(post);
-    		Category.find({}).then(categories=>{
-	    		const postsDocument = {
-		            id: post._id,
-		            title: post.title,
-		            body: post.body,
-		            status: post.status,
-		            allowComments: post.allowComments,
-		            date: post.date,
-		            file: post.file || "flower.jpg"
-				};
-				const catContext = {
-				    categoryDocs: categories.map(document => {
-				      return {
-				        id: document._id,
-				        name: document.name
-				      }
-				    })
-				};
+    		Category.find({}).lean().then(categories=>{
+
+       
+                // res.send({post: post}); 
 
 	         	res.render('home/post', {
-	         		post: postsDocument,
-	         		categories: catContext.categoryDocs
+	         		post: post,
+	         		categories: categories
 	         	});
 	        });
     });

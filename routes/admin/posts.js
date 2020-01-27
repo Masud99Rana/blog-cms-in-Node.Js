@@ -22,25 +22,78 @@ router.all('/*', (req, res, next)=>{
 // show all posts
 router.get('/',(req,res)=>{
 	// res.send("It works");
-	Post.find({}).then(posts=>{
+	Post.find({})
+		.populate('category')
+		.then(posts=>{
 		// console.log(posts);
+		// res.send(posts);
 		const context = {
 	        postsDocuments: posts.map(document => {
-	          return {
-	            id: document._id,
-	            title: document.title,
-	            body: document.body,
-	            status: document.status,
-	            allowComments: document.allowComments,
-	            date: document.date,
-	            file: document.file || "flower.jpg"
-	          }
+	        	
+	        	let category = "Unknown";
+
+	        	if(document.category){
+	        		category = document.category.name;
+	        	}
+
+				return {
+					id: document._id,
+					title: document.title,
+					body: document.body,
+					status: document.status,
+					allowComments: document.allowComments,
+					date: document.date,
+					file: document.file || "flower.jpg",
+					category
+				};
 	        })
 		};
 		// console.log(context.postsDocuments);
-		      
+		// res.send(context.postsDocuments);
 	    res.render('admin/posts', {posts: context.postsDocuments});
 	});
+});
+
+
+//logged user posts
+router.get('/my-posts', (req, res)=>{
+    // Post.find({user: req.user.id})
+    //     .populate('category')
+    //     .then(posts=>{
+    //         res.render('admin/posts/my-posts', {posts: posts});
+    //     });
+
+    Post.find({user: req.user.id})
+    	.populate('category')
+    	.then(posts=>{
+    	// console.log(posts);
+    	// res.send(posts);
+    	const context = {
+            postsDocuments: posts.map(document => {
+            	
+            	let category = "Unknown";
+
+            	if(document.category){
+            		category = document.category.name;
+            	}
+
+    			return {
+    				id: document._id,
+    				title: document.title,
+    				body: document.body,
+    				status: document.status,
+    				allowComments: document.allowComments,
+    				date: document.date,
+    				file: document.file || "flower.jpg",
+    				category
+    			};
+            })
+    	};
+    	// console.log(context.postsDocuments);
+    	// res.send(context.postsDocuments);
+        res.render('admin/posts/my-posts', {posts: context.postsDocuments});
+    });
+
 });
 
 // Show create post form
@@ -109,6 +162,7 @@ router.post('/create',(req,res)=>{
 		}
 
 		const newPost = new Post({
+			user: req.user.id,
 			title: req.body.title,
 			status: req.body.status,
 			allowComments: allowComments,
@@ -194,6 +248,7 @@ router.put('/edit/:id', (req,res)=>{
 			    });
 			}
 
+			post.user = req.user.id,
 			post.title = req.body.title;
 			post.status = req.body.status;
 			post.allowComments = allowComments;
@@ -212,9 +267,18 @@ router.put('/edit/:id', (req,res)=>{
 router.delete('/:id', (req,res)=>{
 	// res.send('It works');
 	Post.findOne({_id: req.params.id})
+		.populate('comments')
 	    .then(post =>{
 			// res.send('Got it.');
 			fs.unlink(uploadDir + post.file, (err)=>{
+
+				//dealing with an Array
+				if(!post.comments.length < 1){
+					post.comments.forEach(comment=>{
+						comment.remove();
+					})
+				}
+
 				post.remove().then(postRemoved=>{
 					req.flash('success_message', `Post ${postRemoved.title} was deleted successfully.`);
 				    res.redirect('/admin/posts');

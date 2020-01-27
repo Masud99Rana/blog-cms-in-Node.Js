@@ -19,24 +19,24 @@
     </thead>
 
     <tbody>
-    	{{#each posts}}
-    	<tr>
-    		<td>{{id}}</td>
+        {{#each posts}}
+        <tr>
+            <td>{{id}}</td>
             <td><img height="50" width="60" class="img-responsive" src="/uploads/{{file}}" alt=""></td>
-    		<td>{{title}}</td>
-    		<td>{{category}}</td>
+            <td>{{title}}</td>
+            <td>{{category}}</td>
             <td>{{status}}</td>
-    		<td>{{allowComments}}</td>
+            <td>{{allowComments}}</td>
             <td>{{generateDate date 'MMMM Do YYYY'}}</td>
-    		<td>
-    			<a href="/admin/posts/edit/{{id}}" class="btn btn-info">Edit</a> || 
+            <td>
+                <a href="/admin/posts/edit/{{id}}" class="btn btn-info">Edit</a> || 
 
-    			<form action="/admin/posts/{{id}}?_method=DELETE" method="post">
-    				<button type="submit" class="btn btn-danger">Delete</button>
-    			</form>
-    		</td>
-    	</tr>
-    	{{/each}}
+                <form action="/admin/posts/{{id}}?_method=DELETE" method="post">
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </td>
+        </tr>
+        {{/each}}
 
     </tbody>
 </table>

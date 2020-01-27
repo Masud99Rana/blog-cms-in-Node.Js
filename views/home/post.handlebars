@@ -1,5 +1,5 @@
 <div class="row">
-{{> home/form-msgs }}
+
     <!-- Post Content Column -->
     <div class="col-lg-8">
 
@@ -9,7 +9,7 @@
         <!-- Author -->
         <p class="lead">
             by
-            <a href="#">Author</a>
+            <a href="#">{{post.user.firstName}}</a>
         </p>
 
         <hr>
@@ -30,6 +30,11 @@
 
         <hr>
 
+
+    {{#if user}}
+
+     {{#if post.allowComments}}
+
         <!-- Comments Form -->
         <div class="card my-4">
             <h5 class="card-header">Leave a Comment:</h5>
@@ -38,12 +43,50 @@
                     <div class="form-group">
                         <textarea name="body" class="form-control" rows="3"></textarea>
 
-                        <input type="hidden" value="{{post.id}}" name="id">
+                        <input type="hidden" value="{{post._id}}" name="id">
                     </div>
                     <button type="submit" class="btn btn-primary">Submit</button>
                 </form>
             </div>
         </div>
+
+        {{else}}
+
+        <h2>Comments not allowed for this</h2>
+
+            <br>
+            <hr>
+
+
+        {{/if}}
+
+
+    {{else}}
+
+        You need to login to comment <a href="/login">Login</a>
+
+        <br>
+        <hr>
+
+    {{/if}}
+
+    {{#if post.comments}}
+        {{#each post.comments}}
+
+        <!-- Single Comment -->
+        <div class="media mb-4">
+            <img class="d-flex mr-3 rounded-circle" src="http://placehold.it/50x50" alt="">
+            <div class="media-body">
+                <h5 class="mt-0">{{ user.firstName }}</h5>
+
+                {{body}}
+
+            </div>
+        </div>
+
+        {{/each}}
+    {{/if}}
+
 
     </div>
 

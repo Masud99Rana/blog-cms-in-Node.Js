@@ -24,6 +24,8 @@ router.post('/generate-fake-posts', (req, res)=>{
         post.status = 'public';
         post.allowComments = faker.random.boolean();
         post.body = faker.lorem.sentence();
+        post.file = "flower.jpg";
+        post.date = Date.now();
 		
 		// post.save().then(savedPost=>{
 		// 	console.log(i);

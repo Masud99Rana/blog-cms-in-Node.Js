@@ -15,11 +15,30 @@ router.all('/*', (req, res, next)=>{
     next();
 });
 
+// show all comments with user relationship
 router.get('/', (req, res)=>{
 
-    res.send("It is working");
+    Comment.find({user: req.user.id}).populate('user').then(comments=>{
+        // res.send(comments);
+
+            const context = {
+                commentsDocuments: comments.map(document => {
+                  return {
+                    id: document._id,
+                    userName: document.user.firstName,
+                    body: document.body,
+                    approveComment: document.approveComment,
+                    date: document.date
+                  }
+                })
+            };
+            // res.send(context.commentsDocuments);
+        res.render('admin/comments', {comments: context.commentsDocuments});
+    });
 
 });
+
+// insert comment for post
 router.post('/', (req, res)=>{
 
     Post.findOne({_id: req.body.id}).then(post=>{
@@ -37,6 +56,23 @@ router.post('/', (req, res)=>{
             })
         });
     });
+});
+
+
+router.delete('/:id', (req, res)=>{
+
+    Comment.remove({_id: req.params.id}).then(deleteItem=>{
+        Post.findOneAndUpdate({comments: req.params.id},
+            {$pull: {comments: req.params.id}}, (err, data)=>{
+                if(err) console.log(err);
+
+                req.flash('success_message', `The comment was deleted successfully.`);
+                res.redirect('/admin/comments');
+
+            });
+
+        });
+
 });
 
 module.exports = router;
