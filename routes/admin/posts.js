@@ -4,12 +4,20 @@ const Post = require('../../models/Post')
 const Category = require('../../models/Category')
 const { isEmpty, uploadDir } = require('../../helpers/upload-helper');
 const fs = require('fs');
+const { userAuthenticated } = require('../../helpers/authentication');
+
+
+// router.all('/*', userAuthenticated, (req, res, next)=>{
+//     req.app.locals.layout = 'admin';
+//     next();
+// });
 
 
 router.all('/*', (req, res, next)=>{
     req.app.locals.layout = 'admin';
     next();
 });
+
 
 // show all posts
 router.get('/',(req,res)=>{

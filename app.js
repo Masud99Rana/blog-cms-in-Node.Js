@@ -8,11 +8,12 @@ const methodOverride = require('method-override');
 const upload = require('express-fileupload');
 const session = require('express-session');
 const flash = require('connect-flash');
-
+const {mongoDbUrl} = require('./config/database');
+const passport = require('passport');
 
 // DB connection
 mongoose.Promise = global.Promise;
-mongoose.connect('mongodb://localhost:27017/mr-cms',{ useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.connect(mongoDbUrl,{ useNewUrlParser: true, useUnifiedTopology: true })
 	.then(db =>{
     	console.log('mongoDB connected');
 	}).catch(error=> console.log(error));
@@ -49,14 +50,35 @@ app.use(session({
 app.use(flash());
 
 
+// Passport
+app.use(passport.initialize());
+app.use(passport.session());
+
+
 // Local Variables using Middleware
 app.use((req, res, next)=>{
+    
+    let user = req.user || null;
+    let auth = {};
+
+    if(user){
+        auth = {
+            id: user._id,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            email: user.email
+        };
+    }else{
+        auth = null;
+    }
+
+    res.locals.user = auth;
 
     res.locals.success_message = req.flash('success_message');
     res.locals.error_message = req.flash('error_message');
     res.locals.form_errors = req.flash('form_errors');
     res.locals.error = req.flash('error');
-    
+
     next();
 });
 
