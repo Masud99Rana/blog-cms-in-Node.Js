@@ -13,50 +13,40 @@ router.all('/*', (req, res, next)=>{
     next();
 });
 
-// show front page with all posts
-router.get('/',(req, res)=>{
-	
-	Post.find({}).then(posts=>{
-		// console.log(posts);
-		Category.find({}).then(categories=>{
-			
-			const context = {
-		        postsDocuments: posts.map(document => {
-		          return {
-		            id: document._id,
-		            title: document.title,
-		            body: document.body,
-		            status: document.status,
-		            allowComments: document.allowComments,
-		            date: document.date,
-		            file: document.file || "flower.jpg"
-		          }
-		        })
-			};
 
-			const catContext = {
-			    categoryDocs: categories.map(document => {
-			      return {
-			        id: document._id,
-			        name: document.name
-			      }
-			    })
-			};
 
-			// console.log(context.postsDocuments);    
-		    res.render("home/index", {
-		    	posts: context.postsDocuments, 
-		    	categories: catContext.categoryDocs
-		    });
-		});
-	});
+router.get('/', (req, res)=>{
+
+    const perPage = 10;
+    const page = req.query.page || 1;
+
+    Post.find({})
+
+        .skip((perPage * page) - perPage)
+        .limit(perPage)
+        .lean()
+        .then(posts =>{
+
+        Post.countDocuments().lean().then(postCount=>{
+
+            Category.find({}).lean().then(categories=>{
+                res.render('home/index', {
+                    posts: posts,
+                    categories:categories,
+                    current: parseInt(page),
+                    pages: Math.ceil(postCount / perPage)
+                });
+            });
+        });
+    });
 });
 
-//Show single post 
-router.get('/post/:id', (req, res)=>{
-	// res.send(req.params.id);
 
-    Post.findOne({_id: req.params.id})
+//Show single post 
+router.get('/post/:slug', (req, res)=>{
+	// res.send(req.params.slug);
+
+    Post.findOne({slug: req.params.slug})
         .populate({path: 'comments', match: {approveComment: true}, populate: {path: 'user', model: 'users'}})
         .populate('user')
         .lean()

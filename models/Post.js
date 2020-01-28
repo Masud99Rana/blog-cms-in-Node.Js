@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
+const URLSlugs = require('mongoose-url-slugs');
 
 const PostSchema = new Schema({
 	
@@ -21,6 +22,10 @@ const PostSchema = new Schema({
 	title:{
 		type: String,
 		required: true
+	},
+
+	slug: {
+	    type: String
 	},
 
 	status:{
@@ -51,4 +56,5 @@ const PostSchema = new Schema({
 // {usePushEach: true} // must use comma(,) before it........
 );
 
+PostSchema.plugin(URLSlugs('title', {field: 'slug'}));
 module.exports = mongoose.model('posts', PostSchema);

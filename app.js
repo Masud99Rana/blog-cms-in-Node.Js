@@ -18,6 +18,7 @@ mongoose.connect(mongoDbUrl,{ useNewUrlParser: true, useUnifiedTopology: true })
     	console.log('mongoDB connected');
 	}).catch(error=> console.log(error));
 
+mongoose.set('useCreateIndex', true);
 
 // Using Static
 app.use(express.static(path.join(__dirname, 'public')));
@@ -25,8 +26,18 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Set up View Engine
 const {select} = require('./helpers/handlebars-helpers');
 const {generateDate} = require('./helpers/handlebars-helpers');
+const {paginate} = require('./helpers/handlebars-helpers');
 
-app.engine('handlebars',exphbs({defaultLayout: 'home', helpers:{select:select, generateDate: generateDate}}) )
+app.engine('handlebars',
+    exphbs({
+        defaultLayout: 'home',
+        helpers:{
+            select:select, 
+            generateDate: generateDate,
+            paginate: paginate
+        }
+    }));
+
 app.set('view engine', 'handlebars'); 
 //handlebars auto search home.hanlebars in layouts folder
 
